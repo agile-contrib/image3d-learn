@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" href="../logo.png">
+    <script src="../libs/image3D.js"></script>
+    <title>着色器</title>
+
+    <!-- 顶点着色器 -->
+    <script type='x-shader/x-vertex' id='vs'>
+        void main(){
+            gl_Position=vec4(0.0,0.0,0.0,1.0); // 点的位置
+            gl_PointSize=100.0; // 点的大小
+        }
+    </script>
+
+    <!-- 片段着色器 -->
+    <script type='x-shader/x-fragment' id='fs'>
+        void main(){
+            gl_FragColor=vec4(1.0,0.0,0.0,1.0); // 点的颜色
+        }
+    </script>
+</head>
+
+<body>
+
+    <canvas width=500 height=500>非常抱歉，您的浏览器不支持canvas!</canvas>
+
+    <script>
+
+        // 创建3D对象并配置好画布和着色器
+        var image3d = new image3D(document.getElementsByTagName('canvas')[0], {
+            "vertex-shader": document.getElementById("vs").innerText,
+            "fragment-shader": document.getElementById("fs").innerText
+        });
+
+        image3d.Painter().drawPoint(0, 1);
+
+    </script>
+
+    <!--
+
+        取样器（纹理）
+        sampler2D和samplerCube，只能是uniform变量，表示纹理（其实就是图片），
+        texture2D，textureCube是用于在纹理中取颜色的函数。
+
+        精度限定字
+        比如：precision mediump float;
+        highp 高精度，顶点着色器的最低精度
+        mediump 中精度，片元着色器的最低精度
+        lowp 低精度，可以表示任何颜色
+
+        变量类型（和数据类型不一样，注意区分，这是用于定义变量的位置）
+        attribute 只有顶点着色器可以
+        uniform 两着色器都可以
+        varying 沟通两个着色器的
+
+     -->
+
+</body>
+
+</html>
