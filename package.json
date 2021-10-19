@@ -1,0 +1,26 @@
+{
+  "name": "image3d-learn",
+  "version": "0.1.0",
+  "description": "image3D.js学习代码笔记",
+  "scripts": {
+    "start": "npm install && npm run server",
+    "server": "mock-servicer --config server.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agile-contrib/image3d-learn.git"
+  },
+  "keywords": [
+    "image3d",
+    "learn"
+  ],
+  "author": "你好2007",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/agile-contrib/image3d-learn/issues"
+  },
+  "homepage": "https://github.com/agile-contrib/image3d-learn#readme",
+  "dependencies": {
+    "mock-servicer": "^1.2.4"
+  }
+}
