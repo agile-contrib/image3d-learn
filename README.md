@@ -4,8 +4,8 @@ image3D.js学习代码笔记
 ## Issues
 使用的时候遇到任何问题或有好的建议，请点击进入[issue](https://github.com/agile-contrib/image3d-learn/issues)，欢迎参与维护！
 
-<img src='./images/example0.png' />
 <img src='./images/example1.png' />
+<img src='./images/example2.png' />
 
 ## 特别说明
 
