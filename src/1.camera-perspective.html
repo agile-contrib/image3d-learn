@@ -8,6 +8,34 @@
     <link rel="shortcut icon" href="../logo.png">
     <script src="../libs/image3D.js"></script>
     <title>照相机-投影</title>
+
+     <!-- 顶点着色器 -->
+     <script type='x-shader/x-vertex' id='vs'>
+        attribute vec4 a_position;
+        uniform mat4 u_matrix;
+        attribute vec4 a_color;
+        varying vec4 v_color;
+        void main(){
+            vec4 temp=u_matrix * a_position;
+
+            // 表示眼睛距离vec4(0.0,0.0,1.0)的距离
+            float dist=0.7;
+
+            // 使用投影直接计算
+            gl_Position=vec4((dist+2.0)*temp.x/(dist+1.0-temp.z),(dist+2.0)*temp.y/(dist+1.0-temp.z),temp.z,1.0);
+            v_color=a_color;
+        }
+    </script>
+
+    <!-- 片段着色器 -->
+    <script type='x-shader/x-fragment' id='fs'>
+        precision mediump float;
+        varying vec4 v_color;
+        void main(){
+            gl_FragColor=v_color;
+        }
+    </script>
+
 </head>
 
 <body>
@@ -18,50 +46,49 @@
 
         // 创建3D对象并配置好画布和着色器
         var image3d = new image3D(document.getElementsByTagName('canvas')[0], {
-            shader: "camera",
-            depth: true
+            "vertex-shader": document.getElementById("vs").innerText,
+            "fragment-shader": document.getElementById("fs").innerText
         });
 
         // 点的坐标
         image3d.Buffer().write(new Float32Array([
 
             // 右侧的三个三角形
+            0.75, 1.0, -2.0, 0.4, 1.0, 0.4, // 后面的绿色
+            0.25, -1.0, -2.0, 0.4, 1.0, 0.4,
+            1.25, -1.0, -2.0, 1.0, 0.4, 0.4,
+
+            0.75, 1.0, -1.0, 1.0, 1.0, 0.4, // 中间的黄色
+            0.25, -1.0, -1.0, 1.0, 1.0, 0.4,
+            1.25, -1.0, -1.0, 1.0, 0.4, 0.4,
+
             0.75, 1.0, 0.0, 0.4, 0.4, 1.0,  // 前面的蓝色
             0.25, -1.0, 0.0, 0.4, 0.4, 1.0,
             1.25, -1.0, 0.0, 1.0, 0.4, 0.4,
 
-            0.75, 1.0, -2.0, 1.0, 1.0, 0.4, // 中间的黄色
-            0.25, -1.0, -2.0, 1.0, 1.0, 0.4,
-            1.25, -1.0, -2.0, 1.0, 0.4, 0.4,
-
-            0.75, 1.0, -4.0, 0.4, 1.0, 0.4, // 后面的绿色
-            0.25, -1.0, -4.0, 0.4, 1.0, 0.4,
-            1.25, -1.0, -4.0, 1.0, 0.4, 0.4,
-
             // 左侧的三个三角形
-            -0.75, 1.0, 0.0, 0.4, 0.4, 1.0,  // 前面的蓝色
-            -1.25, -1.0, 0.0, 0.4, 0.4, 1.0,
-            -0.25, -1.0, 0.0, 1.0, 0.4, 0.4,
-
-            -0.75, 1.0, -2.0, 1.0, 1.0, 0.4, // 中间的黄色
-            -1.25, -1.0, -2.0, 1.0, 1.0, 0.4,
+            -0.75, 1.0, -2.0, 0.4, 1.0, 0.4, // 后面的绿色
+            -1.25, -1.0, -2.0, 0.4, 1.0, 0.4,
             -0.25, -1.0, -2.0, 1.0, 0.4, 0.4,
 
-            -0.75, 1.0, -4.0, 0.4, 1.0, 0.4, // 后面的绿色
-            -1.25, -1.0, -4.0, 0.4, 1.0, 0.4,
-            -0.25, -1.0, -4.0, 1.0, 0.4, 0.4
+            -0.75, 1.0, -1.0, 1.0, 1.0, 0.4, // 中间的黄色
+            -1.25, -1.0, -1.0, 1.0, 1.0, 0.4,
+            -0.25, -1.0, -1.0, 1.0, 0.4, 0.4,
+
+            -0.75, 1.0, 0.0, 0.4, 0.4, 1.0,  // 前面的蓝色
+            -1.25, -1.0, 0.0, 0.4, 0.4, 1.0,
+            -0.25, -1.0, 0.0, 1.0, 0.4, 0.4
 
         ])).use('a_position', 3, 6, 0).use('a_color', 3, 6, 3);
 
-        var painter = image3d.Painter()
+        var painter = image3d.Painter();
 
         // 传递照相机
         image3d.setUniformMatrix("u_matrix",
             image3d.Camera({
-                size: 2,
-                perspective: 3
+                size: 2
             }).value()
-        )
+        );
 
         // 绘制
         for (var i = 0; i < 6; i++)

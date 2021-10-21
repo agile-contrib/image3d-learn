@@ -4,14 +4,14 @@
 *
 * author 你好2007
 *
-* version 3.2.0
+* version 3.2.3
 *
 * build Thu Apr 11 2019
 *
 * Copyright hai2007 < https://hai2007.gitee.io/sweethome/ >
 * Released under the MIT license
 *
-* Date:Mon Oct 18 2021 15:10:31 GMT+0800 (中国标准时间)
+* Date:Thu Oct 21 2021 20:08:47 GMT+0800 (GMT+08:00)
 */
 
 'use strict';
@@ -413,6 +413,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             } catch (e) {}
             if (context) break;
         }
+        if (!context) throw new Error('Non canvas or browser does not support webgl.');
         return context;
     };
 
@@ -495,6 +496,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         for (var key in valueMethods) {
             glObj[key] = valueMethods[key];
         }
+
+        /**
+         * gl.viewport告诉WebGL如何将裁剪空间（-1 到 +1）中的点转换到像素空间
+         * 当你第一次创建WebGL上下文的时候WebGL会设置视域大小和画布大小匹配
+         * 但是在那之后就需要你自己设置（当你改变画布大小就需要告诉WebGL新的视域设置）
+         * 为了避免麻烦，我们每次都主动调用一下
+         */
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         return glObj;
     }
@@ -699,6 +708,36 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return matrix4Obj;
     }
 
+    var toString = Object.prototype.toString;
+
+    /**
+     * 获取一个值的类型字符串[object type]
+     *
+     * @param {*} value 需要返回类型的值
+     * @returns {string} 返回类型字符串
+     */
+    function getType(value) {
+        if (value == null) {
+            return value === undefined ? '[object Undefined]' : '[object Null]';
+        }
+        return toString.call(value);
+    }
+
+    /**
+     * 判断一个值是不是number。
+     *
+     * @param {*} value 需要判断类型的值
+     * @returns {boolean} 如果是number返回true，否则返回false
+     */
+    function _isNumber(value) {
+        return typeof value === 'number' || value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && getType(value) === '[object Number]';
+    }
+
+    var isNumber = _isNumber;
+    var isArray = function isArray(input) {
+        return Array.isArray(input);
+    };
+
     /**
      * 照相机
      * -------------------------
@@ -713,20 +752,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 var _this3 = this;
 
                 // 压缩空间的范围
-                if (!('size' in options)) options.size = 1;
+                if (isNumber(options.size)) {
+                    options.size = [options.size, options.size, options.size];
+                } else if (!isArray(options.size)) {
+                    options.size = [1, 1, 1];
+                }
 
                 // 摄像头位置改变和物体位置改变矩阵初始化
                 var matrix4 = Matrix4();
 
-                // 应用投影矩阵
-                if ('perspective' in options) {
-                    var d = options.perspective - 1;
-                    matrix4.multiply([d + 2, 0, 0, 0, 0, d + 2, 0, 0, 0, 0, 1, -1, 0, 0, -1 * (d + 1), d + 1]);
-                }
-
                 // 应用压缩空间矩阵
-                var size = 1 / options.size;
-                matrix4.multiply([size, 0, 0, 0, 0, size, 0, 0, 0, 0, size, 0, 0, 0, 0, 1]);
+                matrix4.multiply([1 / options.size[0], 0, 0, 0, 0, 1 / options.size[1], 0, 0, 0, 0, 1 / options.size[2], 0, 0, 0, 0, 1]);
 
                 /**
                  * 摄像头位置改变
