@@ -6,6 +6,7 @@ image3D.js学习代码笔记
 
 <img src='./images/example1.png' />
 <img src='./images/example2.png' />
+<img src='./images/example4.png' />
 
 ## 特别说明
 
